@@ -1,4 +1,4 @@
-package src.table;
+package src.classes;
 
 import java.util.Deque;
 import java.util.Map;
@@ -7,6 +7,7 @@ public class Graph {
 
 	//ATTRIBUT ?
 	//TODO
+
 
     public Graph(String localisations, String roads)  {
         //TODO
