@@ -1,15 +1,30 @@
-package src.table;
+package src.classes;
 
+import java.io.File;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 public class Graph {
 
 	//ATTRIBUT ?
 	//TODO
+  protected Map<String, Noeud> correspondanceIdNoeud;
+  protected Map<String, Arc> correspondanceNomRue;
 
-    public Graph(String localisations, String roads)  {
+
+    public Graph(String localisations, String roads) throws Exception {
         //TODO
+      correspondanceIdNoeud = new HashMap<>();
+      File csv = new File(localisations);
+      DocumentBuilderFactory docBuildFact = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuild = docBuildFact.newDocumentBuilder();
+      Document doc = docBuild.parse(csv);
+
     }
 
     public Localisation[] determinerZoneInondee(long[] idsOrigin,double epsilon) {

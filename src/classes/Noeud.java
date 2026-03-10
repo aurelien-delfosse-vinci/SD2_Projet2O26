@@ -1,4 +1,4 @@
-package src.table;
+package src.classes;
 
 public class Noeud {
 
