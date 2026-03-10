@@ -3,17 +3,17 @@ package src.classes;
 public class Noeud {
 
     private int id;
-    private double latitude;
-    private double longitude;
-    private String nom;
-    private double altitude;
+    private double lat;
+    private double lon;
+    private String name;
+    private double alt;
 
-    public Noeud(int id, double latitude, double longitude, String nom, int altitude) {
+    public Noeud(int id, double lat, double lon, String name, int alt) {
         this.id = id;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.nom = nom;
-        this.altitude = altitude;
+        this.lat = lat;
+        this.lon = lon;
+        this.name = name;
+        this.alt = alt;
     }
 
     public int getId() {
@@ -21,18 +21,18 @@ public class Noeud {
     }
 
     public double getLatitude() {
-        return latitude;
+        return lat;
     }
 
     public double getLongitude() {
-        return longitude;
+        return lon;
     }
 
     public String getNom() {
-        return nom;
+        return name;
     }
 
     public double getAltitude() {
-        return altitude;
+        return alt;
     }
 }
