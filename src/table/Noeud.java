@@ -32,7 +32,7 @@ public class Noeud {
         return nom;
     }
 
-    public int getAltitude() {
+    public double getAltitude() {
         return altitude;
     }
 }
