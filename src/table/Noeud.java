@@ -6,7 +6,7 @@ public class Noeud {
     private double latitude;
     private double longitude;
     private String nom;
-    private int altitude;
+    private double altitude;
 
     public Noeud(int id, double latitude, double longitude, String nom, int altitude) {
         this.id = id;
