@@ -35,9 +35,9 @@ public class Graph {
         if (firstLine) { firstLine = false; continue; }
         String[] tokens = line.split(",");
         int id = Integer.parseInt(tokens[0]);
-        double lat = Double.parseDouble(tokens[1]);
-        double lon = Double.parseDouble(tokens[2]);
-        String name = tokens[3];
+        String name = tokens[1];
+        double lat = Double.parseDouble(tokens[2]);
+        double lon = Double.parseDouble(tokens[3]);
         int alt = Integer.parseInt(tokens[4]);
 
         Noeud n = new Noeud(id, lat, lon, name, alt);
