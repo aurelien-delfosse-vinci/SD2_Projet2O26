@@ -29,4 +29,37 @@ public class Localisation {
         ", est inondée=" + inondee +
         '}';
   }
+
+  public int getId() {
+    return noeud.getId();
+  }
+
+  public double getAltitude() {
+    return noeud.getAltitude();
+  }
+
+  public double getLatitude() {
+    return noeud.getLatitude();
+  }
+
+  public double getLongitude() {
+    return noeud.getLongitude();
+  }
+
+  public String getNom() {
+    return noeud.getNom();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Localisation)) return false;
+    Localisation that = (Localisation) o;
+    return noeud.getId() == that.noeud.getId();
+  }
+
+  @Override
+  public int hashCode() {
+    return Integer.hashCode(noeud.getId());
+  }
 }

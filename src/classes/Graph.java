@@ -2,9 +2,14 @@ package src.classes;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 public class Graph {
@@ -69,7 +74,49 @@ public class Graph {
 
   public Localisation[] determinerZoneInondee(long[] idsOrigin,double epsilon) {
     //TODO
-    return null ;
+    Deque<Noeud> queue = new ArrayDeque<>();
+    Set<Noeud> visited = new HashSet<>();
+    List<Localisation> result = new ArrayList<>();
+    Map<Noeud, Localisation> mapLoc = new HashMap<>();
+
+    // Initialisation
+    for (long id : idsOrigin) {
+      Noeud n = correspondanceIdNoeud.get((int) id);
+      if (n != null) {
+        queue.add(n);
+        visited.add(n);
+
+        Localisation loc = new Localisation(n);
+        loc.setInondee(true);
+        mapLoc.put(n, loc);
+        result.add(loc);
+      }
+    }
+
+    while (!queue.isEmpty()) {
+      Noeud current = queue.poll();
+
+      for (Arc arc : correspondanceNomRue.values()) {
+        if (arc.getOrigine().equals(current)) {
+
+          Noeud voisin = arc.getArrivee();
+
+          if (!visited.contains(voisin) &&
+              voisin.getAltitude() <= current.getAltitude() + epsilon) {
+
+            visited.add(voisin);
+            queue.add(voisin);
+
+            Localisation loc = new Localisation(voisin);
+            loc.setInondee(true);
+            mapLoc.put(voisin, loc);
+            result.add(loc);
+          }
+        }
+      }
+    }
+
+    return result.toArray(new Localisation[0]);
   }
 
   public Deque<Localisation> trouverCheminLePlusCourtPourContournerLaZoneInondee(long idOrigin, long idDestination, Localisation[] floodedZone) {

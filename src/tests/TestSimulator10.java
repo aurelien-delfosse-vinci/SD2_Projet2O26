@@ -8,7 +8,7 @@ import src.classes.Graph;
 import src.classes.Localisation;
 
 public class TestSimulator10 {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         double epsilon = 0.1 ;
         double k = 0.05 ;
         System.out.println("---------------------------------------------------------------");
