@@ -17,7 +17,7 @@ public class Graph {
   //ATTRIBUT ?
   //TODO
   protected Map<Long, Noeud> correspondanceIdNoeud;
-  protected Map<String, Arc> correspondanceNomRue;
+  protected Map<Noeud, List<Arc>> correspondanceNomRue;
 
 
   public Graph(String localisations, String roads) throws Exception {
@@ -63,7 +63,7 @@ public class Graph {
         Arc a = new Arc(streetName, source, target, dist);
 
         // clé unique pour éviter les collisions sur streetName
-        correspondanceNomRue.put(streetName + "_" + sourceId + "_" + targetId, a);
+        correspondanceNomRue.computeIfAbsent(source, k -> new ArrayList<>()).add(a);
       }
     } catch (Exception e) {
       throw new Exception(e.getMessage());
@@ -75,41 +75,33 @@ public class Graph {
     Deque<Noeud> queue = new ArrayDeque<>();
     Set<Noeud> visited = new HashSet<>();
     List<Localisation> result = new ArrayList<>();
-    Map<Noeud, Localisation> mapLoc = new HashMap<>();
 
     // Initialisation
     for (long id : idsOrigin) {
-      Noeud n = correspondanceIdNoeud.get((int) id);
+      Noeud n = correspondanceIdNoeud.get(id);
       if (n != null) {
         queue.add(n);
         visited.add(n);
-
-        Localisation loc = new Localisation(n);
-        loc.setInondee(true);
-        mapLoc.put(n, loc);
-        result.add(loc);
+        result.add(new Localisation(n));
       }
     }
 
     while (!queue.isEmpty()) {
       Noeud current = queue.poll();
 
-      for (Arc arc : correspondanceNomRue.values()) {
-        if (arc.getOrigine().equals(current)) {
+      List<Arc> voisins = correspondanceNomRue.get(current);
+      if(voisins == null)
+        continue;
 
-          Noeud voisin = arc.getArrivee();
+      for (Arc arc : voisins) {
+        Noeud voisin = arc.getArrivee();
 
-          if (!visited.contains(voisin) &&
-              voisin.getAltitude() <= current.getAltitude() + epsilon) {
+        if (!visited.contains(voisin) &&
+            voisin.getAltitude() <= current.getAltitude() + epsilon) {
 
-            visited.add(voisin);
-            queue.add(voisin);
-
-            Localisation loc = new Localisation(voisin);
-            loc.setInondee(true);
-            mapLoc.put(voisin, loc);
-            result.add(loc);
-          }
+          visited.add(voisin);
+          queue.add(voisin);
+          result.add(new Localisation(voisin));
         }
       }
     }

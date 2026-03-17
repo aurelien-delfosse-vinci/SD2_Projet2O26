@@ -1,5 +1,7 @@
 package src.classes;
 
+import java.util.Objects;
+
 public class Noeud {
 
     private Long id;
@@ -35,4 +37,18 @@ public class Noeud {
     public double getAltitude() {
         return alt;
     }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Noeud noeud = (Noeud) o;
+    return Objects.equals(id, noeud.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 }
