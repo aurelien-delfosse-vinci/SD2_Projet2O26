@@ -30,7 +30,7 @@ public class Localisation {
         '}';
   }
 
-  public int getId() {
+  public Long getId() {
     return noeud.getId();
   }
 
@@ -60,6 +60,6 @@ public class Localisation {
 
   @Override
   public int hashCode() {
-    return Integer.hashCode(noeud.getId());
+    return Long.hashCode(noeud.getId());
   }
 }

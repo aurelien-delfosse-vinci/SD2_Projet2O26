@@ -16,7 +16,7 @@ public class Graph {
 
   //ATTRIBUT ?
   //TODO
-  protected Map<Integer, Noeud> correspondanceIdNoeud;
+  protected Map<Long, Noeud> correspondanceIdNoeud;
   protected Map<String, Arc> correspondanceNomRue;
 
 
@@ -34,11 +34,11 @@ public class Graph {
       while ((line = br.readLine()) != null) {
         if (firstLine) { firstLine = false; continue; }
         String[] tokens = line.split(",");
-        int id = Integer.parseInt(tokens[0]);
+        Long id = Long.parseLong(tokens[0]);
         String name = tokens[1];
         double lat = Double.parseDouble(tokens[2]);
         double lon = Double.parseDouble(tokens[3]);
-        int alt = Integer.parseInt(tokens[4]);
+        double alt = Double.parseDouble(tokens[4]);
 
         Noeud n = new Noeud(id, lat, lon, name, alt);
         correspondanceIdNoeud.put(id, n);
@@ -52,23 +52,21 @@ public class Graph {
       while ((line = br.readLine()) != null) {
         if (firstLine) { firstLine = false; continue; }
         String[] tokens = line.split(",");
-        int sourceId = Integer.parseInt(tokens[0]);
-        int targetId = Integer.parseInt(tokens[1]);
+        Long sourceId = Long.parseLong(tokens[0]);
+        Long targetId = Long.parseLong(tokens[1]);
         double dist = Double.parseDouble(tokens[2]);
         String streetName = tokens[3];
 
         Noeud source = correspondanceIdNoeud.get(sourceId);
         Noeud target = correspondanceIdNoeud.get(targetId);
 
-        if (source == null || target == null) {
-          throw new Exception("Noeud source ou target non trouvé pour l'arc " + streetName);
-        }
-
         Arc a = new Arc(streetName, source, target, dist);
 
         // clé unique pour éviter les collisions sur streetName
         correspondanceNomRue.put(streetName + "_" + sourceId + "_" + targetId, a);
       }
+    } catch (Exception e) {
+      throw new Exception(e.getMessage());
     }
   }
 

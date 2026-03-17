@@ -2,13 +2,13 @@ package src.classes;
 
 public class Noeud {
 
-    private int id;
+    private Long id;
     private double lat;
     private double lon;
     private String name;
     private double alt;
 
-    public Noeud(int id, double lat, double lon, String name, int alt) {
+    public Noeud(Long id, double lat, double lon, String name, double alt) {
         this.id = id;
         this.lat = lat;
         this.lon = lon;
@@ -16,7 +16,7 @@ public class Noeud {
         this.alt = alt;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
