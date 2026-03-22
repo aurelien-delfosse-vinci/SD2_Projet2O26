@@ -175,7 +175,65 @@ public class Graph {
 
   public Deque<Localisation> trouverCheminDEvacuationLePlusCourt(long idOrigin, long idEvacuation, double vVehicule, Map<Localisation,Double> tFlood) {
     //TODO
-    return null ;
+    Map<Noeud, Double> tempsArrivee = new HashMap<>();
+    Map<Noeud, Noeud> predecesseur = new HashMap<>();
+
+    PriorityQueue<Noeud> priorityQueue =
+            new PriorityQueue<>(Comparator.comparingDouble(tempsArrivee::get));
+
+    Noeud origine = correspondanceIdNoeud.get(idOrigin);
+    Noeud destination = correspondanceIdNoeud.get(idEvacuation);
+
+    if (origine == null || destination == null)
+      return new ArrayDeque<>();
+
+    tempsArrivee.put(origine, 0.0);
+    priorityQueue.add(origine);
+
+    while (!priorityQueue.isEmpty()) {
+      Noeud current = priorityQueue.poll();
+      double tempsCurrent = tempsArrivee.get(current);
+
+      if (current.equals(destination)){
+        break;
+      }
+
+      List<Arc> arcs = correspondanceNomRue.get(current);
+      if (arcs == null) {
+        continue;
+      }
+
+      for (Arc arc : arcs) {
+        Noeud next = arc.getArrivee();
+
+        double tempsArc = arc.getDistance() / vVehicule;
+        double tempsNext = tempsCurrent + tempsArc;
+
+        Localisation locNext = new Localisation(next);
+
+        Double tFloodNext = tFlood.get(locNext);
+
+        if (tFloodNext != null && tempsNext > tFloodNext)
+          continue;
+        if (!tempsArrivee.containsKey(next) || tempsNext < tempsArrivee.get(next)) {
+          tempsArrivee.put(next, tempsNext);
+          predecesseur.put(next, current);
+          priorityQueue.add(next);
+        }
+      }
+    }
+    Deque<Localisation> chemin = new ArrayDeque<>();
+
+    if (!tempsArrivee.containsKey(destination))
+      return chemin; // Aucun chemin possible
+
+    Noeud courant = destination;
+    while (courant != null) {
+      chemin.addFirst(new Localisation(courant));
+      courant = predecesseur.get(courant);
+    }
+
+        return chemin;
   }
 
 
