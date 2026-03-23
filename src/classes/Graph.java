@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 
@@ -112,65 +111,62 @@ public class Graph {
 
   public Deque<Localisation> trouverCheminLePlusCourtPourContournerLaZoneInondee(long idOrigin, long idDestination, Localisation[] floodedZone) {
     //TODO
-    Noeud noeudOrigine = correspondanceIdNoeud.get(idOrigin);
-    Noeud noeudArrive = correspondanceIdNoeud.get(idDestination);
-
-    Set<Noeud> zoneInondee = new HashSet<>();
-    for (Localisation localisation : floodedZone) {
-      zoneInondee.add(localisation.getNoeud());
-    }
-
-    //permet de garder une trace des Noeuds deja fait pour éviter les boucles
-    Set<Noeud> vistiees = new HashSet<>();
-    vistiees.add(noeudOrigine);
-
-    //est a la file de noeuds
-    Deque<Noeud> listNoeuds = new ArrayDeque<>();
-    listNoeuds.add(noeudOrigine);
-
-    //permet de garder les liaisons entre noeuds
-    Map<Noeud,Noeud> cheminEnfantParent = new HashMap<>();
-    cheminEnfantParent.put(noeudOrigine,null);
-
-    while (!listNoeuds.isEmpty()) {
-      Noeud noeudTester = listNoeuds.poll();
-      if(noeudTester.equals(noeudArrive)){
-        break;
-      }
-      if(correspondanceNomRue.get(noeudTester) != null){
-        for (Arc arc : correspondanceNomRue.get(noeudTester)) {
-          Noeud prochainNoeud = arc.getArrivee();
-          if(!zoneInondee.contains(prochainNoeud) && !vistiees.contains(prochainNoeud)){
-            vistiees.add(prochainNoeud);
-            listNoeuds.add(prochainNoeud);
-            cheminEnfantParent.put(prochainNoeud,noeudTester);
-          }
-        }
-      }
-    }
-
-    if(!cheminEnfantParent.containsKey(noeudArrive)){
-      throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
-    }
-
-    Deque<Localisation> cheminLePlusCourt = new ArrayDeque<>();
-    Noeud noeud = noeudArrive;
-    while(noeud != null){
-      Localisation localisation = new Localisation(noeud);
-
-      cheminLePlusCourt.addFirst(localisation);
-      noeud = cheminEnfantParent.get(noeud);
-    }
-
-    if(cheminLePlusCourt.getFirst().getNoeud().equals(noeudOrigine)){
-      return cheminLePlusCourt;
-    }
-    throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
+    return null;
   }
 
   public Map<Localisation,Double> determinerChronologieDeLaCrue(long[] idsOrigin, double vWaterInit,double k) {
     //TODO
-    return null ;
+    Map<Noeud, Double> tempsArrivee = new HashMap<>();
+    Map<Noeud, Double> vitesseEau = new HashMap<>();
+    Map<Localisation, Double> resultat = new LinkedHashMap<>();
+
+    PriorityQueue<Noeud> priorityQueue = new PriorityQueue<>(Comparator.comparingDouble(tempsArrivee::get));
+
+    // Initialisation : les sources sont inondées à t = 0
+    for (long id : idsOrigin) {
+      Noeud n = correspondanceIdNoeud.get(id);
+      if (n != null) {
+        tempsArrivee.put(n, 0.0);
+        vitesseEau.put(n, vWaterInit);
+        priorityQueue.add(n);
+      }
+    }
+
+    // Dijkstra modifié
+    while (!priorityQueue.isEmpty()) {
+      Noeud current = priorityQueue.poll();
+      double tempsCurrent = tempsArrivee.get(current);
+      double vitesseCurrent = vitesseEau.get(current);
+
+      resultat.put(new Localisation(current), tempsCurrent);
+
+      List<Arc> arcs = correspondanceNomRue.get(current);
+      if(arcs == null)
+        continue;
+
+      for (Arc arc : arcs) {
+        Noeud next = arc.getArrivee();
+
+        double distance = arc.getDistance();
+        double pente = (current.getAltitude()-next.getAltitude())/distance;
+
+        double vitesseNext = vitesseCurrent+k*pente;
+
+        if(vitesseNext <= 0)
+          continue; // Si vitesse est négative ou vaut 0, l'eau ne passe pas
+
+        double tempsArc = distance/vitesseNext;
+        double tempsNext = tempsCurrent+tempsArc;
+
+        // Relaxation Dijkstra
+        if (!tempsArrivee.containsKey(next) || tempsNext < tempsArrivee.get(next)) {
+          tempsArrivee.put(next, tempsNext);
+          vitesseEau.put(next, vitesseNext);
+          priorityQueue.add(next);
+        }
+      }
+    }
+    return resultat ;
   }
 
   public Deque<Localisation> trouverCheminDEvacuationLePlusCourt(long idOrigin, long idEvacuation, double vVehicule, Map<Localisation,Double> tFlood) {
