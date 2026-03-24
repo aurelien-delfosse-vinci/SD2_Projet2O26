@@ -114,8 +114,60 @@ public class Graph {
   }
 
   public Deque<Localisation> trouverCheminLePlusCourtPourContournerLaZoneInondee(long idOrigin, long idDestination, Localisation[] floodedZone) {
-    //TODO
-    return null;
+    Noeud noeudOrigine = correspondanceIdNoeud.get(idOrigin);
+    Noeud noeudArrive = correspondanceIdNoeud.get(idDestination);
+
+    Set<Noeud> zoneInondee = new HashSet<>();
+    for (Localisation localisation : floodedZone) {
+      zoneInondee.add(localisation.getNoeud());
+    }
+
+    //permet de garder une trace des Noeuds deja fait pour éviter les boucles
+    Set<Noeud> vistiees = new HashSet<>();
+    vistiees.add(noeudOrigine);
+
+    //est a la file de noeuds
+    Deque<Noeud> listNoeuds = new ArrayDeque<>();
+    listNoeuds.add(noeudOrigine);
+
+    //permet de garder les liaisons entre noeuds
+    Map<Noeud,Noeud> cheminEnfantParent = new HashMap<>();
+    cheminEnfantParent.put(noeudOrigine,null);
+
+    while (!listNoeuds.isEmpty()) {
+      Noeud noeudTester = listNoeuds.poll();
+      if(noeudTester.equals(noeudArrive)){
+        break;
+      }
+      if(correspondanceNomRue.get(noeudTester) != null){
+        for (Arc arc : correspondanceNomRue.get(noeudTester)) {
+          Noeud prochainNoeud = arc.getArrivee();
+          if(!zoneInondee.contains(prochainNoeud) && !vistiees.contains(prochainNoeud)){
+            vistiees.add(prochainNoeud);
+            listNoeuds.add(prochainNoeud);
+            cheminEnfantParent.put(prochainNoeud,noeudTester);
+          }
+        }
+      }
+    }
+
+    if(!cheminEnfantParent.containsKey(noeudArrive)){
+      throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
+    }
+
+    Deque<Localisation> cheminLePlusCourt = new ArrayDeque<>();
+    Noeud noeud = noeudArrive;
+    while(noeud != null){
+      Localisation localisation = new Localisation(noeud);
+
+      cheminLePlusCourt.addFirst(localisation);
+      noeud = cheminEnfantParent.get(noeud);
+    }
+
+    if(cheminLePlusCourt.getFirst().getNoeud().equals(noeudOrigine)){
+      return cheminLePlusCourt;
+    }
+    throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
   }
 
   public Map<Localisation,Double> determinerChronologieDeLaCrue(long[] idsOrigin, double vWaterInit,double k) {
