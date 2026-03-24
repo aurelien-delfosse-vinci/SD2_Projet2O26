@@ -33,10 +33,9 @@ public class Graph {
 
     // --- Lecture des noeuds CSV ---
     try (BufferedReader br = new BufferedReader(new FileReader(localisations))) {
-      String line;
-      boolean firstLine = true; // pour ignorer l'en-tête
+      String line = br.readLine();
+
       while ((line = br.readLine()) != null) {
-        if (firstLine) { firstLine = false; continue; }
         String[] tokens = line.split(",");
         Long id = Long.parseLong(tokens[0]);
         String name = tokens[1];
@@ -155,19 +154,7 @@ public class Graph {
       throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
     }
 
-    Deque<Localisation> cheminLePlusCourt = new ArrayDeque<>();
-    Noeud noeud = noeudArrive;
-    while(noeud != null){
-      Localisation localisation = new Localisation(noeud);
-
-      cheminLePlusCourt.addFirst(localisation);
-      noeud = cheminEnfantParent.get(noeud);
-    }
-
-    if(cheminLePlusCourt.getFirst().getNoeud().equals(noeudOrigine)){
-      return cheminLePlusCourt;
-    }
-    throw new RuntimeException("Pas de chemin de " + noeudOrigine.getId() + "à" + noeudArrive.getId() + "évitant la zone inondée");
+    return recontructionChemin(cheminEnfantParent,noeudArrive);
   }
 
   public Map<Localisation,Double> determinerChronologieDeLaCrue(long[] idsOrigin, double vWaterInit,double k) {
@@ -274,19 +261,25 @@ public class Graph {
         }
       }
     }
-    Deque<Localisation> chemin = new ArrayDeque<>();
 
     if (!tempsArrivee.containsKey(destination))
-      return chemin; // Aucun chemin possible
+      return new ArrayDeque<>(); // Aucun chemin possible
 
-    Noeud courant = destination;
-    while (courant != null) {
-      chemin.addFirst(new Localisation(courant));
-      courant = predecesseur.get(courant);
-    }
+    Deque<Localisation> chemin = new ArrayDeque<>();
 
-        return chemin;
+    return recontructionChemin(predecesseur,destination);
   }
 
+  private Deque<Localisation> recontructionChemin(Map<Noeud,Noeud> parent, Noeud destination) {
+    Deque<Localisation> cheminLePlusCourt = new ArrayDeque<>();
+    Noeud noeud = destination;
+    while(noeud != null){
+      Localisation localisation = new Localisation(noeud);
+
+      cheminLePlusCourt.addFirst(localisation);
+      noeud = parent.get(noeud);
+    }
+    return cheminLePlusCourt;
+  }
 
 }
