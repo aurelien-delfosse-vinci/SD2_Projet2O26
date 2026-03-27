@@ -265,8 +265,6 @@ public class Graph {
     if (!tempsArrivee.containsKey(destination))
       return new ArrayDeque<>(); // Aucun chemin possible
 
-    Deque<Localisation> chemin = new ArrayDeque<>();
-
     return recontructionChemin(predecesseur,destination);
   }
 
